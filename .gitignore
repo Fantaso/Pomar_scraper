@@ -1,3 +1,9 @@
+*.txt
+scraper_bp.py
+requests_html_eg.py
+parsing.html
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
