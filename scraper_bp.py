@@ -1,7 +1,76 @@
+# TODO: add error handler to wait until connection is back again and continue
+'''
+  File "<input>", line 1, in <modul
+e>
+    c.start_range()
+  File "/home/fantaso/projects/poma
+r_scraper/scraper_bp.py", line 207,
+ in start_range
+    if self.verify_cedula(cedula):
+  File "/home/fantaso/projects/poma
+r_scraper/scraper_bp.py", line 51,
+in verify_cedula
+    r = self.session.post(url)
+  File "/home/fantaso/.local/lib/py
+thon3.6/site-packages/requests/sess
+ions.py", line 581, in post
+    return self.request('POST', url
+, data=data, json=json, **kwargs)
+  File "/home/fantaso/.local/lib/py
+thon3.6/site-packages/requests_html
+.py", line 672, in request
+    r = super(HTMLSession, self).re
+quest(*args, **kwargs)
+  File "/home/fantaso/.local/lib/py
+thon3.6/site-packages/requests/sess
+ions.py", line 533, in request
+    resp = self.send(prep, **send_k
+wargs)
+  File "/home/fantaso/.local/lib/py
+thon3.6/site-packages/requests/sess
+ions.py", line 646, in send
+    r = adapter.send(request, **kwa
+rgs)
+  File "/home/fantaso/.local/lib/py
+thon3.6/site-packages/requests/adap
+ters.py", line 498, in send
+    raise ConnectionError(err, requ
+est=request)
+requests.exceptions.ConnectionError
+: ('Connection aborted.', RemoteDis
+connected('Remote end closed connec
+tion without response',))
+
+-------------------------------------------------
+NO INternet access:
+------------------------------------------------
+Traceback (most recent call last):
+  File "<input>", line 1, in <module>
+    c.start_range()
+  File "/home/fantaso/projects/pomar_scraper/scraper_bp.py", line 207, in start_range
+    if self.verify_cedula(cedula):
+  File "/home/fantaso/projects/pomar_scraper/scraper_bp.py", line 51, in verify_cedula
+    r = self.session.post(url)
+  File "/home/fantaso/.local/lib/python3.6/site-packages/requests/sessions.py", line 581, in post
+    return self.request('POST', url, data=data, json=json, **kwargs)
+  File "/home/fantaso/.local/lib/python3.6/site-packages/requests_html.py", line 672, in request
+    r = super(HTMLSession, self).request(*args, **kwargs)
+  File "/home/fantaso/.local/lib/python3.6/site-packages/requests/sessions.py", line 533, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/fantaso/.local/lib/python3.6/site-packages/requests/sessions.py", line 646, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/fantaso/.local/lib/python3.6/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='www.bodegaspomar.com.ve', port=80): Max retries exceeded with url: /actualizacion/website/verificar_cedula/18243032 (Caused by NewConnectionError('<u
+rllib3.connection.HTTPConnection object at 0x7fa9bb18b630>: Failed to establish a new connection: [Errno -2] Name or service not known',))
+
+'''
+
 from requests_html import HTMLSession
 import os
 import datetime
 import time
+from config import URL_WEBSITE, URL_VERIFY_CEDULA, URL_FORM
 
 '''
 from scraper import Scraper
@@ -18,9 +87,9 @@ client_db.start_list()
 class ScraperBp:
     # get session in website
     def __init__(self, begin_cedula = 0, end_cedula = 1, cedula_list = []):
-        self.URL_WEBSITE        = ''
-        self.URL_VERIFY_CEDULA  = ''
-        self.URL_FORM           = ''
+        self.URL_WEBSITE        = URL_WEBSITE
+        self.URL_VERIFY_CEDULA  = URL_VERIFY_CEDULA
+        self.URL_FORM           = URL_FORM
 
         self.session            = HTMLSession() # initiates session
         self._request           = self.session.get(self.URL_WEBSITE)
@@ -302,3 +371,32 @@ class ScraperBp:
             for line in file.readlines():
                 cedula_list.append(line.split(' ')[0])
         return cedula_list
+
+    @staticmethod
+    def homogenous_table():
+        with open('database_pomar2.txt', 'r+') as file:
+            for line in file.readlines():
+                line_obj = line.split(',')
+                # the original line will be the new line to be replaced unless line_obj is ==17 which then replace the original line with the real new line
+                new_line = line
+                # print(len(line_obj))
+                # if the last obj in the line "date_found" dont exist
+                if len(line_obj) == 17:
+                    # print(len(line_obj))
+                    # get the last item in list and erase it and add a new last obj cleaned with last 2 characters '\n' off of it
+                    last_obj = line_obj[-1]
+                    line_obj.remove(last_obj)
+                    line_obj.append(last_obj[:-2])
+                    # add the date_found obj to complete a table of 18 obj
+                    line_obj.append(str(datetime.datetime(1900,1,1)) + '\n')
+                    new_line = ','.join(line_obj)
+                    # print(len(line_obj), ','.join(line_obj))
+                with open('database_pomar3.txt', 'a') as file:
+                    file.write(new_line)
+
+    @staticmethod
+    def read_table_objs():
+        with open('database_pomar3.txt', 'r+') as file:
+            for line in file.readlines():
+                line_obj = line.split(',')
+                print(len(line_obj))
