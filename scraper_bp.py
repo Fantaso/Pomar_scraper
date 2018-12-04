@@ -332,3 +332,8 @@ class ScraperBp:
             for line in file.readlines():
                 line_obj = line.split(',')
                 print(len(line_obj))
+
+    @staticmethod
+    def table_len():
+        with open('database_pomar.txt', 'r') as file:
+                print(len(file.readlines()))
