@@ -8,5 +8,5 @@ col_names = ['cedula','genre','city','name','last_name','phone','birthday','emai
 table = pd.read_table('database_pomar3.txt', header = None, names = col_names, sep = ',')
 
 # print table
-print(table.head())
+# print(table.head())
 print(table)
