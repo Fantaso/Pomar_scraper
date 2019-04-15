@@ -1,4 +1,4 @@
-# Pomar Scraper
+# Database Harvesting with Scraping
 Web scraping project
 
 ## Procedure
